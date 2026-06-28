@@ -8,3 +8,4 @@ public interface MovimentacaoDAO {
     void registrarMovimentacao(Movimentacao movimentacao);
     List<Movimentacao> listarPorCarteira(int idCarteira);
 }
+
