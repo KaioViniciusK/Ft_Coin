@@ -9,6 +9,7 @@ import com.mvc.dao.CarteiraDAO;
 import com.mvc.dao.MovimentacaoDAO;
 import com.mvc.model.Carteira;
 import com.mvc.model.Movimentacao;
+import com.mvc.model.OraculoClient;
 
 public class CarteiraController {
     private final CarteiraDAO carteiraDAO;
