@@ -46,9 +46,6 @@ public class MovimentacaoView {
         }
     }
 
-    // ==========================================
-    // MÉTODOS DE TELA (USER INTERFACE)
-    // ==========================================
 
     private void comprarMoedaUI() {
         System.out.println("\n--- Compra de Moeda Virtual ---");

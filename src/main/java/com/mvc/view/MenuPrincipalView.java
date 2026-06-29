@@ -1,11 +1,15 @@
 package com.mvc.view;
 
-import com.mvc.controller.CarteiraController;
 import java.util.Scanner;
+
+import com.mvc.controller.CarteiraController;
 
 public class MenuPrincipalView {
     private final Scanner scanner;
     private final CarteiraView carteiraView;
+    private final MovimentacaoView movimentacaoView;
+    private final RelatorioView relatorioView;
+    private final AjudaView ajudaView;
     
     // Códigos ANSI para colorir o terminal
     public static final String ANSI_RESET = "\u001B[0m";
@@ -18,6 +22,9 @@ public class MenuPrincipalView {
         this.scanner = new Scanner(System.in);
         // Passamos o scanner e o controller para as sub-views
         this.carteiraView = new CarteiraView(this.scanner, carteiraController);
+        this.movimentacaoView = new MovimentacaoView(this.scanner, carteiraController);
+        this.relatorioView = new RelatorioView(this.scanner, carteiraController);
+        this.ajudaView = new AjudaView(this.scanner);
     }
 
     public void exibirMenu() {
@@ -40,13 +47,13 @@ public class MenuPrincipalView {
                         carteiraView.exibirMenuCarteira();
                         break;
                     case 2:
-                        System.out.println(ANSI_YELLOW + "Menu de Movimentação em construção..." + ANSI_RESET);
+                        movimentacaoView.exibirMenuMovimentacao();
                         break;
                     case 3:
-                        System.out.println(ANSI_YELLOW + "Menu de Relatórios em construção..." + ANSI_RESET);
+                        relatorioView.exibirMenuRelatorios();
                         break;
                     case 4:
-                        System.out.println(ANSI_YELLOW + "Menu de Ajuda em construção..." + ANSI_RESET);
+                        ajudaView.exibirMenuAjuda();
                         break;
                     case 5:
                         System.out.println(ANSI_GREEN + "Saindo do sistema. Até logo!" + ANSI_RESET);
@@ -60,4 +67,5 @@ public class MenuPrincipalView {
             }
         }
     }
+
 }

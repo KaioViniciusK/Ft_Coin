@@ -46,10 +46,10 @@ public class CarteiraView {
                         // Apenas volta para o menu anterior
                         break;
                     default:
-                        System.out.println(MenuPrincipalView.ANSI_RED + "Erro: OpÃÂ§ÃÂ£o invÃÂ¡lida!" + MenuPrincipalView.ANSI_RESET);
+                        System.out.println(MenuPrincipalView.ANSI_RED + "Erro: Opcao invalida!" + MenuPrincipalView.ANSI_RESET);
                 }
             } else {
-                System.out.println(MenuPrincipalView.ANSI_RED + "Erro: Por favor, digite um nÃÂºmero vÃÂ¡lido." + MenuPrincipalView.ANSI_RESET);
+                System.out.println(MenuPrincipalView.ANSI_RED + "Erro: Por favor, digite um numero valido." + MenuPrincipalView.ANSI_RESET);
                 scanner.nextLine();
             }
         }
@@ -58,7 +58,7 @@ public class CarteiraView {
     private void incluirCarteiraUI() {
         System.out.println("\n--- Nova Carteira ---");
         try {
-            System.out.print("Digite o ID (nÃÂºmero inteiro): ");
+            System.out.print("Digite o ID (numero inteiro): ");
             int id = Integer.parseInt(scanner.nextLine());
             
             System.out.print("Digite o Nome do Titular: ");
@@ -72,7 +72,7 @@ public class CarteiraView {
             System.out.println(MenuPrincipalView.ANSI_GREEN + "Sucesso: Carteira criada!" + MenuPrincipalView.ANSI_RESET);
 
         } catch (NumberFormatException e) {
-            System.out.println(MenuPrincipalView.ANSI_RED + "Erro: O ID precisa ser um nÃÂºmero inteiro." + MenuPrincipalView.ANSI_RESET);
+            System.out.println(MenuPrincipalView.ANSI_RED + "Erro: O ID precisa ser um numero inteiro." + MenuPrincipalView.ANSI_RESET);
         } catch (IllegalArgumentException e) {
             // Se o controller barrar por ID duplicado, o erro estoura aqui vermelho na tela
             System.out.println(MenuPrincipalView.ANSI_RED + e.getMessage() + MenuPrincipalView.ANSI_RESET);
@@ -89,7 +89,7 @@ public class CarteiraView {
             System.out.println(MenuPrincipalView.ANSI_GREEN + "Carteira encontrada: " + carteira.toString() + MenuPrincipalView.ANSI_RESET);
             
         } catch (NumberFormatException e) {
-            System.out.println(MenuPrincipalView.ANSI_RED + "Erro: O ID precisa ser um nÃÂºmero inteiro." + MenuPrincipalView.ANSI_RESET);
+            System.out.println(MenuPrincipalView.ANSI_RED + "Erro: O ID precisa ser um numero inteiro." + MenuPrincipalView.ANSI_RESET);
         } catch (IllegalArgumentException e) {
             System.out.println(MenuPrincipalView.ANSI_RED + e.getMessage() + MenuPrincipalView.ANSI_RESET);
         }
@@ -115,7 +115,7 @@ public class CarteiraView {
             System.out.println(MenuPrincipalView.ANSI_GREEN + "Sucesso: Carteira atualizada!" + MenuPrincipalView.ANSI_RESET);
 
         } catch (NumberFormatException e) {
-            System.out.println(MenuPrincipalView.ANSI_RED + "Erro: O ID precisa ser um nÃÂºmero inteiro." + MenuPrincipalView.ANSI_RESET);
+            System.out.println(MenuPrincipalView.ANSI_RED + "Erro: O ID precisa ser um numero inteiro." + MenuPrincipalView.ANSI_RESET);
         } catch (IllegalArgumentException e) {
             System.out.println(MenuPrincipalView.ANSI_RED + e.getMessage() + MenuPrincipalView.ANSI_RESET);
         }
@@ -128,10 +128,10 @@ public class CarteiraView {
             int id = Integer.parseInt(scanner.nextLine());
             
             controller.excluirCarteira(id);
-            System.out.println(MenuPrincipalView.ANSI_GREEN + "Sucesso: Carteira excluÃÂ­da!" + MenuPrincipalView.ANSI_RESET);
+            System.out.println(MenuPrincipalView.ANSI_GREEN + "Sucesso: Carteira excluida!" + MenuPrincipalView.ANSI_RESET);
             
         } catch (NumberFormatException e) {
-            System.out.println(MenuPrincipalView.ANSI_RED + "Erro: O ID precisa ser um nÃÂºmero inteiro." + MenuPrincipalView.ANSI_RESET);
+            System.out.println(MenuPrincipalView.ANSI_RED + "Erro: O ID precisa ser um numero inteiro." + MenuPrincipalView.ANSI_RESET);
         } catch (IllegalArgumentException e) {
             // Caso tente excluir uma carteira com saldo ou que nÃÂ£o exista, a mensagem de erro do Controller aparece aqui
             System.out.println(MenuPrincipalView.ANSI_RED + e.getMessage() + MenuPrincipalView.ANSI_RESET);

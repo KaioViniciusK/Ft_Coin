@@ -21,11 +21,11 @@ public class RelatorioView {
         int opcao = -1;
         while (opcao != 6) {
             System.out.println("\n" + MenuPrincipalView.ANSI_BLUE + "--- MENU RELATÓRIOS ---" + MenuPrincipalView.ANSI_RESET);
-            System.out.println("1. Listar carteiras ordenadas por identificador"); // [cite: 78]
-            System.out.println("2. Listar carteiras ordenadas por nome do titular"); // [cite: 79]
-            System.out.println("3. Exibir saldo atual de uma carteira"); // [cite: 80]
-            System.out.println("4. Exibir histórico de movimentação de uma carteira"); // [cite: 81]
-            System.out.println("5. Apresentar ganho ou perda total de cada carteira"); // [cite: 82]
+            System.out.println("1. Listar carteiras ordenadas por identificador"); 
+            System.out.println("2. Listar carteiras ordenadas por nome do titular"); 
+            System.out.println("3. Exibir saldo atual de uma carteira"); 
+            System.out.println("4. Exibir histórico de movimentação de uma carteira"); 
+            System.out.println("5. Apresentar ganho ou perda total de cada carteira"); 
             System.out.println("6. Voltar ao menu principal");
             System.out.print("Escolha uma opção: ");
 
@@ -60,10 +60,6 @@ public class RelatorioView {
             }
         }
     }
-
-    // ==========================================
-    // MÉTODOS DE TELA (USER INTERFACE)
-    // ==========================================
 
     private void listarPorIdUI() {
         System.out.println("\n--- Carteiras por Identificador ---");

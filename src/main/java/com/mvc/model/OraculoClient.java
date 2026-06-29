@@ -26,11 +26,11 @@ public class OraculoClient {
                 return rs.getBigDecimal("Cotacao"); // Retorna o valor real do banco
             } else {
                 // Se o banco nÃÂ£o tiver a cotaÃÂ§ÃÂ£o do dia, ele avisa
-                throw new RuntimeException("Erro: Nenhuma cotaÃÂ§ÃÂ£o encontrada no OrÃÂ¡culo para a data " + data);
+                throw new RuntimeException("Erro: Nenhuma cotaÃÂ§ÃÂ£o encontrada no Oraculo para a data " + data);
             }
             
         } catch (SQLException e) {
-            throw new RuntimeException("Erro ao consultar o banco de dados do OrÃÂ¡culo: " + e.getMessage());
+            throw new RuntimeException("Erro ao consultar o banco de dados do Oraculo: " + e.getMessage());
         }
     }
 }
