@@ -2,8 +2,8 @@ package com.mvc.controller;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Comparator;
+import java.util.List;
 
 import com.mvc.dao.CarteiraDAO;
 import com.mvc.dao.MovimentacaoDAO;
@@ -107,8 +107,8 @@ public class CarteiraController {
     }
 
     // Método auxiliar para gerar o ID do movimento na hora da simulação local
-    private int gerarIdMovimento() {
-        return contadorMovimentos++;
+ private int gerarIdMovimento() {
+        return (int) (System.currentTimeMillis() % 1000000);
     }
 
     // Listar carteiras ordenadas por identificador
