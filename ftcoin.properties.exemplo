@@ -1,0 +1,16 @@
+# Copie para ftcoin.properties (na pasta de execução) e ajuste. Não versione este arquivo com senhas reais.
+# Servidor de cotações (API do professor)
+oraculo.host=localhost
+oraculo.porta=1234
+oraculo.timeout.ms=5000
+oraculo.grupo=NOME_DO_GRUPO
+oraculo.senha=SENHA_DO_GRUPO
+# Para demonstração sem servidor: cotações geradas localmente (NÃO são valores reais)
+#oraculo.modo=simulado
+# MariaDB (só usado com o argumento mariadb)
+bd.url=jdbc:mariadb://HOST:3306/BANCO
+bd.usuario=USUARIO
+bd.senha=SENHA
+# Log
+log.nivel=INFO
+log.arquivo=ftcoin-%g.log
