@@ -1,5 +1,10 @@
 package ftcoin;
 
+import java.time.Clock;
+import java.util.logging.Logger;
+
+import javax.swing.SwingUtilities;
+
 import ftcoin.config.ConfigAplicacao;
 import ftcoin.dao.CarteiraDAO;
 import ftcoin.dao.DAOFactory;
@@ -18,15 +23,7 @@ import ftcoin.service.MovimentacaoService;
 import ftcoin.service.OraculoService;
 import ftcoin.view.CarteiraSwingView;
 import ftcoin.view.MenuPrincipalSwingView;
-import java.time.Clock;
-import java.util.logging.Logger;
-import javax.swing.SwingUtilities;
 
-/**
- * Ponto de entrada. Uso: {@code java ftcoin.Main [memoria|mariadb] [pt|en|es]}. A fonte de dados
- * padrão é a memória; sem segundo argumento o idioma é detectado pelo sistema. O Main apenas
- * escolhe a fonte e monta as camadas.
- */
 public final class Main {
     private static final Logger LOG = Logger.getLogger(Main.class.getName());
 
