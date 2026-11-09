@@ -70,9 +70,7 @@ public final class OraculoSocketClient implements OraculoClient {
     }
 
     private NetworkResponse enviar(NetworkRequest requisicao) throws IOException, ClassNotFoundException {
-        try (Socket socket = new Socket()) {
-            socket.connect(new InetSocketAddress(host, porta), timeoutMs);
-            socket.setSoTimeout(timeoutMs);
+        try (Socket socket = new Socket(host, porta)) {
             try (ObjectOutputStream saida = new ObjectOutputStream(socket.getOutputStream())) {
                 saida.writeObject(requisicao);
                 saida.flush();
