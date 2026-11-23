@@ -3,10 +3,12 @@ package ftcoin.service;
 import ftcoin.model.Cotacao;
 import ftcoin.oraculo.OraculoClient;
 import ftcoin.oraculo.OraculoException;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
@@ -15,13 +17,24 @@ import java.util.logging.Logger;
 /**
  * Fornece cotações com cache em memória (Map de data para cotação) para reduzir consultas de rede.
  * As faltas de uma mesma chamada viram uma única requisição, cobrindo a menor faixa de datas necessária.
- * Datas que o servidor não devolveu ficam marcadas e não são consultadas de novo na sessão.
+ *
+ * <p>Regras que protegem os resultados financeiros:
+ * <ul>
+ *   <li>uma cotação só entra no cache depois de a resposta inteira ser validada; falha de rede ou
+ *       resposta inconsistente não grava nada;</li>
+ *   <li>só se memoriza a ausência de datas anteriores a hoje; a cotação de hoje pode ainda não ter
+ *       sido publicada, então ela é consultada de novo na próxima chamada;</li>
+ *   <li>uma cotação mais antiga nunca substitui a pedida por causa de uma falha de consulta
+ *       (ver {@link #cotacaoDeMercado(LocalDate)}).</li>
+ * </ul>
  */
 public final class OraculoService {
     private static final Logger LOG = Logger.getLogger(OraculoService.class.getName());
-    private static final int JANELA_ULTIMA_COTACAO_DIAS = 7;
+    /** Quantos dias para trás a cotação de mercado pode recuar quando o servidor não tem a data de hoje. */
+    private static final int JANELA_COTACAO_MERCADO_DIAS = 7;
 
     private final OraculoClient cliente;
+    private final Clock relogio;
     private final Map<LocalDate, Cotacao> cache = new HashMap<>();
     private final Set<LocalDate> semCotacao = new HashSet<>();
     private int requisicoes;
@@ -30,7 +43,16 @@ public final class OraculoService {
     private int erros;
 
     public OraculoService(OraculoClient cliente) {
+        this(cliente, Clock.systemDefaultZone());
+    }
+
+    /**
+     * @param cliente fonte das cotações
+     * @param relogio define "hoje", usado para decidir quais ausências podem ser memorizadas
+     */
+    public OraculoService(OraculoClient cliente, Clock relogio) {
         this.cliente = cliente;
+        this.relogio = relogio;
     }
 
     /**
@@ -61,32 +83,36 @@ public final class OraculoService {
     }
 
     /**
-     * Cotação de mercado: a mais recente até a data, dentro de uma janela de 7 dias. Se a rede falhar,
-     * usa a mais recente já guardada no cache dessa janela.
+     * Cotação de mercado na data de referência (normalmente hoje). Só recua para um dia anterior
+     * (no máximo 7) quando o servidor respondeu com sucesso e confirmou que não tem cotação para os
+     * dias mais recentes, como em um fim de semana ou feriado. Se a consulta falhar (rede, timeout,
+     * erro do servidor ou resposta inválida), a cotação anterior guardada no cache NÃO é usada como
+     * substituta: o resultado seria calculado com um preço que não é o do dia.
      *
-     * @param data data de referência (normalmente hoje)
-     * @return a cotação mais recente encontrada
-     * @throws CotacaoIndisponivelException se não houver nenhuma cotação na janela
+     * @param data data de referência
+     * @return a cotação mais recente na janela, confirmada pelo servidor
+     * @throws CotacaoIndisponivelException se a consulta falhar ou não houver cotação na janela
      */
-    public synchronized Cotacao ultimaCotacaoAte(LocalDate data) {
-        Set<LocalDate> janela = new HashSet<>();
-        for (int i = 0; i < JANELA_ULTIMA_COTACAO_DIAS; i++) {
-            janela.add(data.minusDays(i));
+    public synchronized Cotacao cotacaoDeMercado(LocalDate data) {
+        garantir(Set.of(data));
+        Cotacao doDia = cache.get(data);
+        if (doDia != null) {
+            return doDia;
         }
-        CotacaoIndisponivelException falha = null;
-        try {
-            garantir(janela);
-        } catch (CotacaoIndisponivelException e) {
-            falha = e;
-            LOG.log(Level.WARNING, "Usando o cache para a cotação de mercado até {0}", data);
+        Set<LocalDate> anteriores = new HashSet<>();
+        for (int i = 1; i < JANELA_COTACAO_MERCADO_DIAS; i++) {
+            anteriores.add(data.minusDays(i));
         }
-        for (int i = 0; i < JANELA_ULTIMA_COTACAO_DIAS; i++) {
+        garantir(anteriores);
+        for (int i = 1; i < JANELA_COTACAO_MERCADO_DIAS; i++) {
             Cotacao cotacao = cache.get(data.minusDays(i));
             if (cotacao != null) {
+                LOG.log(Level.WARNING, "Sem cotação de {0} no servidor; cotação de mercado vem de {1}",
+                        new Object[] {data, cotacao.getData()});
                 return cotacao;
             }
         }
-        throw falha != null ? falha : new CotacaoIndisponivelException(data, null);
+        throw new CotacaoIndisponivelException(data, null);
     }
 
     private void garantir(Collection<LocalDate> datas) {
@@ -107,10 +133,10 @@ public final class OraculoService {
         requisicoes++;
         long inicio = System.nanoTime();
         try {
-            for (Cotacao cotacao : cliente.obter(primeira, ultima)) {
-                cache.put(cotacao.getData(), cotacao);
-            }
-            for (LocalDate dia = primeira; !dia.isAfter(ultima); dia = dia.plusDays(1)) {
+            Map<LocalDate, Cotacao> recebidas = validar(cliente.obter(primeira, ultima), primeira, ultima);
+            cache.putAll(recebidas);
+            LocalDate hoje = LocalDate.now(relogio);
+            for (LocalDate dia = primeira; dia.isBefore(hoje) && !dia.isAfter(ultima); dia = dia.plusDays(1)) {
                 if (!cache.containsKey(dia)) {
                     semCotacao.add(dia);
                 }
@@ -122,6 +148,34 @@ public final class OraculoService {
             LOG.log(Level.SEVERE, "Falha ao consultar cotações de " + primeira + " a " + ultima, e);
             throw new CotacaoIndisponivelException(primeira, e);
         }
+    }
+
+    /**
+     * Confere a resposta antes de ela tocar o cache: lista presente, sem elementos nulos e sem datas
+     * repetidas com valores diferentes. Datas fora da faixa pedida são descartadas.
+     */
+    private static Map<LocalDate, Cotacao> validar(List<Cotacao> lista, LocalDate primeira, LocalDate ultima)
+            throws OraculoException {
+        if (lista == null) {
+            throw new OraculoException("Resposta do oráculo sem lista de cotações");
+        }
+        Map<LocalDate, Cotacao> validas = new HashMap<>();
+        for (Cotacao cotacao : lista) {
+            if (cotacao == null) {
+                throw new OraculoException("Resposta do oráculo com cotação nula");
+            }
+            LocalDate data = cotacao.getData();
+            if (data.isBefore(primeira) || data.isAfter(ultima)) {
+                LOG.log(Level.WARNING, "Cotação de {0} fora da faixa pedida ({1} a {2}) foi descartada",
+                        new Object[] {data, primeira, ultima});
+                continue;
+            }
+            Cotacao anterior = validas.putIfAbsent(data, cotacao);
+            if (anterior != null && anterior.getValor().compareTo(cotacao.getValor()) != 0) {
+                throw new OraculoException("Resposta do oráculo com valores diferentes para " + data);
+            }
+        }
+        return validas;
     }
 
     /** @return número de consultas feitas ao servidor nesta sessão */

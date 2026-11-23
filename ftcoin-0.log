@@ -57,3 +57,24 @@
 2026-11-09 11:00:50 | INFO | ftcoin.service.MovimentacaoService | Auditoria: VENDA de 50 FTCoins em 2026-11-09 na carteira 123
 2026-11-09 11:00:55 | INFO | ftcoin.service.OraculoService | Cotações de 2026-11-03 a 2026-11-08 obtidas em 1.423 ms
 2026-11-09 11:01:19 | INFO | ftcoin.service.OraculoService | Resumo do oráculo: 2 requisições, 2 acertos de cache, 7 faltas, 0 erros
+2026-11-09 11:06:32 | INFO | ftcoin | Log iniciado no nível INFO
+2026-11-09 11:06:32 | INFO | ftcoin.Main | Fonte de dados: MEMORIA
+2026-11-09 11:07:16 | INFO | ftcoin.service.MovimentacaoService | Auditoria: COMPRA de 400 FTCoins em 2026-11-09 na carteira 123
+2026-11-09 11:07:27 | INFO | ftcoin.service.MovimentacaoService | Auditoria: VENDA de 50 FTCoins em 2026-11-09 na carteira 123
+2026-11-09 11:08:15 | INFO | ftcoin.service.MovimentacaoService | Auditoria: COMPRA de 1000 FTCoins em 2026-11-09 na carteira 456
+2026-11-09 11:08:26 | INFO | ftcoin.service.MovimentacaoService | Auditoria: VENDA de 400 FTCoins em 2026-11-09 na carteira 456
+2026-11-09 11:08:38 | INFO | ftcoin.service.OraculoService | Cotações de 2026-11-09 a 2026-11-09 obtidas em 255 ms
+2026-11-09 11:08:38 | INFO | ftcoin.service.OraculoService | Cotações de 2026-11-03 a 2026-11-08 obtidas em 327 ms
+2026-11-09 11:11:13 | INFO | ftcoin.service.OraculoService | Resumo do oráculo: 2 requisições, 26 acertos de cache, 7 faltas, 0 erros
+2026-11-22 00:01:44 | INFO | ftcoin | Log iniciado no nível INFO
+2026-11-22 00:01:44 | INFO | ftcoin.Main | Fonte de dados: MEMORIA
+2026-11-22 00:02:36 | INFO | ftcoin.service.MovimentacaoService | Auditoria: COMPRA de 100 FTCoins em 2026-11-22 na carteira 123
+2026-11-22 00:02:46 | INFO | ftcoin.service.MovimentacaoService | Auditoria: VENDA de 10 FTCoins em 2026-11-22 na carteira 123
+2026-11-22 00:02:53 | SEVERE | ftcoin.service.OraculoService | Falha ao consultar cotações de 2026-11-22 a 2026-11-22
+    causa: ftcoin.oraculo.OraculoException: Falha de rede ao consultar 143.106.243.64:1234
+2026-11-22 00:03:26 | SEVERE | ftcoin.service.OraculoService | Falha ao consultar cotações de 2026-11-20 a 2026-11-20
+    causa: ftcoin.oraculo.OraculoException: Falha de rede ao consultar 143.106.243.64:1234
+2026-11-22 00:03:34 | INFO | ftcoin.service.OraculoService | Resumo do oráculo: 2 requisições, 0 acertos de cache, 2 faltas, 2 erros
+2026-11-22 00:05:43 | INFO | ftcoin | Log iniciado no nível INFO
+2026-11-22 00:05:43 | INFO | ftcoin.Main | Fonte de dados: MEMORIA
+2026-11-22 00:06:27 | INFO | ftcoin.service.OraculoService | Resumo do oráculo: 0 requisições, 0 acertos de cache, 0 faltas, 0 erros

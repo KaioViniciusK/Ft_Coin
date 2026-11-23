@@ -49,13 +49,21 @@ public final class OraculoSocketClient implements OraculoClient {
     public List<Cotacao> obter(LocalDate primeira, LocalDate ultima) throws OraculoException {
         long inicio = System.nanoTime();
         try {
-            NetworkResponse resposta = enviar(new NetworkRequest(grupo, senha, primeira, ultima));
-            if (resposta.getErrorMessage() != null) {
-                throw new OraculoException("Servidor respondeu com erro: " + resposta.getErrorMessage());
+            Object lido = enviar(new NetworkRequest(grupo, senha, primeira, ultima));
+            if (!(lido instanceof NetworkResponse)) {
+                throw new OraculoException("Resposta fora do protocolo do servidor");
+            }
+            NetworkResponse resposta = (NetworkResponse) lido;
+            String erro = resposta.getErrorMessage();
+            if (erro != null && !erro.isBlank()) {
+                throw new OraculoException("Servidor respondeu com erro: " + erro);
             }
             List<Cotacao> cotacoes = new ArrayList<>();
             if (resposta.getExchangeRates() != null) {
                 for (ExchangeRate taxa : resposta.getExchangeRates()) {
+                    if (taxa == null) {
+                        throw new OraculoException("Resposta do servidor com cotação nula");
+                    }
                     cotacoes.add(new Cotacao(taxa.getDate(), taxa.getValue()));
                 }
             }
@@ -66,16 +74,20 @@ public final class OraculoSocketClient implements OraculoClient {
             throw new OraculoException("Versão incompatível das classes de protocolo", e);
         } catch (IOException e) {
             throw new OraculoException("Falha de rede ao consultar " + host + ":" + porta, e);
+        } catch (IllegalArgumentException e) {
+            throw new OraculoException("Cotação inválida recebida do servidor", e);
         }
     }
 
-    private NetworkResponse enviar(NetworkRequest requisicao) throws IOException, ClassNotFoundException {
-        try (Socket socket = new Socket(host, porta)) {
+    private Object enviar(NetworkRequest requisicao) throws IOException, ClassNotFoundException {
+        try (Socket socket = new Socket()) {
+            socket.connect(new InetSocketAddress(host, porta), timeoutMs);
+            socket.setSoTimeout(timeoutMs);
             try (ObjectOutputStream saida = new ObjectOutputStream(socket.getOutputStream())) {
                 saida.writeObject(requisicao);
                 saida.flush();
                 try (ObjectInputStream entrada = new ObjectInputStream(socket.getInputStream())) {
-                    return (NetworkResponse) entrada.readObject();
+                    return entrada.readObject();
                 }
             }
         }

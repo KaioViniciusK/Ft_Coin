@@ -85,7 +85,8 @@ public final class MovimentacaoService {
 
     /**
      * Apura o resultado da carteira por custo médio ponderado e a mercado. As cotações das datas
-     * dos movimentos são obtidas em uma só consulta; a cotação de mercado só é buscada se houver saldo.
+     * dos movimentos são obtidas em uma só consulta; a cotação de mercado só é buscada se houver saldo
+     * e, se não puder ser confirmada no servidor, a apuração falha em vez de usar um preço antigo.
      *
      * @return o resultado financeiro
      * @throws NegocioException se a carteira não existir ou uma cotação necessária não puder ser obtida
@@ -129,7 +130,7 @@ public final class MovimentacaoService {
         BigDecimal cotacaoMercado = null;
         BigDecimal saldoMercado = BigDecimal.ZERO;
         if (saldo.signum() > 0) {
-            cotacaoMercado = oraculo.ultimaCotacaoAte(LocalDate.now(relogio)).getValor();
+            cotacaoMercado = oraculo.cotacaoDeMercado(LocalDate.now(relogio)).getValor();
             saldoMercado = saldo.multiply(cotacaoMercado);
         }
         BigDecimal resultadoMercado = realizado.add(saldoMercado).subtract(custoTotal);

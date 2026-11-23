@@ -306,14 +306,20 @@ public final class TodosOsTestes {
             f.redeFora = true;
             igual(BigDecimal.ONE, o.cotar(dia(4)).getValor(), "valor do cache");
         });
-        caso("OraculoService: cotação de mercado usa o dia mais recente da janela; rede fora usa o cache", () -> {
+        caso("OraculoService: cotação de mercado usa a data pedida; rede fora não usa cotação antiga", () -> {
             ClienteFalso f = new ClienteFalso();
             f.valores.put(dia(8), new BigDecimal("9"));
             f.valores.put(dia(10), new BigDecimal("11"));
             OraculoService o = new OraculoService(f);
-            igual(new BigDecimal("11"), o.ultimaCotacaoAte(dia(10)).getValor(), "mais recente");
+            igual(new BigDecimal("11"), o.cotacaoDeMercado(dia(10)).getValor(), "cotação do dia");
             f.redeFora = true;
-            igual(new BigDecimal("9"), o.ultimaCotacaoAte(dia(9)).getValor(), "janela de 9 usa o dia 8 do cache");
+            boolean falhou = false;
+            try {
+                o.cotacaoDeMercado(dia(9));
+            } catch (ftcoin.service.CotacaoIndisponivelException e) {
+                falhou = true;
+            }
+            verdadeiro(falhou, "rede fora não pode usar o dia 8 do cache");
         });
         caso("OraculoSimuladoClient: valores determinísticos entre 10 e 15", () -> {
             var a = new OraculoSimuladoClient().obter(dia(1), dia(3));
